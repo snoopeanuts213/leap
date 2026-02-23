@@ -1,0 +1,178 @@
+<!doctype HTML>
+<html>
+	<head>
+		<title>
+			LEAP 1021 ~ 1180
+		</title>
+		<style>
+			.main {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%,-50%);
+				width: 100%;
+			}
+			#Q_Text {
+				font-size: 70px;
+				text-align: center;
+				user-select: none;
+				margin-top: 0px;
+			}
+			#A_Text {
+				font-size: 20px;
+				text-align: center;
+				user-select: none;
+			}
+			#A_Input {
+				height: 30ox;
+				font-size: 30px;
+				position: relative;
+				left: 50%;
+				transform: translateX(-50%);
+			}
+			#progress {
+				position: absolute;
+				top: 10%;
+				left: 20%;
+			}
+			#result {
+				visibility: hidden;
+				background-color: #EEE;
+				height: 300px;
+				width: 700px; 
+				opacity: 0.95;
+				border-radius: 30px;
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%,-50%);
+				user-select: none;
+			}
+			#result p {
+				text-align: center;
+				font-size: 50px;
+			}
+			#result input {
+				position: relative;
+				left: 50%;
+				transform: translateX(-50%);
+			}
+		</style>
+	</head>
+	<body>
+		<div class="main">
+			<p id="Q_Text"></p>
+			<p id="A_Text">none
+			</p>
+			<form onsubmit="return send();">
+				<input id="A_Input">
+			</form>
+		</div>
+		<div id="result">
+			<p id="R_Text">正答率 : </p>
+			<form onsubmit="return restart();">
+				<input  type="submit" value="もう一度" >
+			</form>
+		</div>
+		<p id="progress"></p>
+		<script>
+			var QText = document.getElementById("Q_Text");
+			var AText = document.getElementById("A_Text");
+			var AInput = document.getElementById("A_Input");
+			var result = document.getElementById("result");
+			var RText = document.getElementById("R_Text");
+			var progress = document.getElementById("progress");
+			var Question	= {
+				all : [""],
+				now : [""]
+			}
+			var fail = 0;
+			var color = ["#FFF","#FFA","#EA0","#B00"];
+			var sent = 0;
+			var finished = 0;
+			var len = 0;
+			function send() {
+				event.preventDefault()
+				sent++;
+				if (AInput.value == Question.now[1]) {
+					finished++;
+					progress.innerHTML = `${finished} / ${len}`;
+					AInput.value = "";
+					AInput.style.backgroundColor = "#FFF";
+					AInput.style.color = "#000";
+					if (Question.all[0].length == 0) {
+						fin()
+					} else {
+						next()
+					}
+				} else {
+					fail++;
+					AInput.value = "";
+					AText.style.visibility = "visible";
+					var ans = "";
+					if (fail == 1) {
+						for (var i = 0; i < Question.now[1].length - 1; i++) ans += "*";
+						ans += Question.now[1].at(ans.length)
+					} else {
+						if (fail == 2) {
+							ans += Question.now[1].at(0)
+							for (var i = 0; i < Question.now[1].length - 2; i++) ans += "*";
+							ans += Question.now[1].at(ans.length)
+						} else {
+							ans = Question.now[1]
+						}
+					}
+					AText.innerHTML = ans;
+					if (fail < 3) {
+						AInput.style.backgroundColor = color[fail];
+					} else {
+						AInput.style.backgroundColor = color[3];
+						AInput.style.color = "#FFF";
+					}
+				}
+			}
+
+			function next() {
+					fail = 0;
+					AInput.style.backgroundColor = "#FFF";
+					AInput.style.color = "#000";
+					var random = Math.floor(Math.random()*Question.all[0].length);
+
+					for (var n = 0; n < 2; n++) {
+						Question.now[n] = Question.all[n][random];
+					}
+
+					Question.all[0].splice(random,1)
+					Question.all[1].splice(random,1)
+					QText.innerHTML = Question.now[0];
+					AText.innerHTML = "none";
+					AText.style.visibility = "hidden";
+			}
+
+			function restart() {
+				event.preventDefault();
+				result.style.visibility = "hidden";
+				start(); 
+			}
+			
+			function start() {
+				finished = 0;
+				sent = 0;
+				Question.all = [
+					["固体の (s)","衛星 (s)","軌道 (o)","打ち上げる (l)","試み (a)","能力 (c)","力がある (c)","〜を達成する (a)","必死の (d)","AをBに捧げる (d)","苦痛 (p)","負担 (s)","治療法 (r)","薬局 (p)","医師 (p)","不調 (d)","妊娠した (p)","臨床の (c)","〜を治す (h)","に感染させる (i)","足首 (a)","親指 (t)","額 (f)","下あご (c)","胸 (c)","胸 (b)","肺 (l)","臓器 (o)","視力 (v)","骸骨 (s)","感覚 (s)","規定 (c)","議題 (a)","自由 (l)","委員会 (c)","人類 (h)","人類 (m)","権威 (a)","正義 (j)","保険 (i)","苦難 (h)","貧困 (p)","大混乱 (c)","孤立 (i)","地域 (r)","証拠 (p)","保証 (w)","原理 (p)","起源 (o)","環境 (s)","任務 (m)","計画 (p)","記念碑 (m)","革命 (r)","契約 (c)","インフラ (i)","〜と交渉する (n)","協力する (c)","〜を回復する (r)","〜を創立する (f)","保守的な (c)","情勢 (a)","機関 (a)","議会 (c)","〜界 (k)","共和国 (r)","帝国 (e)","援助 (a)","改革 (r)","大臣 (m)","議会 (p)","領土 (t)","世論調査 (p)","財産 (f)","財産 (p)","資金 (f)","株 (s)","労働 (l)","働きすぎる (o)","会社 (f)","労働組合 (u)","経営 (a)","秘書 (s)","編集長 (e)","依頼人 (c)","〜を新規採用する (r)","基礎 (b)","要素 (e)","〜を構成する (c)","〜を統一する (u)","AをBと結びつける (c)","団結する (u)","関連 (l)","関連のある (r)","殺人 (m)","〜を逮捕する (a)","刑務所 (p)","犯罪 (v)","目撃者 (w)","弾丸 (b)","剣 (s)","傷 (w)","勝利 (t)","軍事的な (m)","戦略 (s)","〜を征服する (c)","BからAを守る (d)","〜を支配する (d)","AからBを奪う (r)","AからBを奪う (d)","〜を壊滅させる (d)","激突する (c)","危険 (h)","破片 (d)","孤児 (o)","奴隷 (s)","知人 (a)","商人 (m)","住人 (r)","乗組員 (c)","〜を追いかける (c)","進む (p)","薄れる (f)","溶ける (d)","浮かぶ (f)","沈む (s)","跳ねる (b)","〜を変える (t)","転換 (s)","〜を修正する (m)","〜を修正する (r)","〜を向上させる (e)","〜を下げる (l)","航海 (v)","〜を確認する (c)","〜を確実にする (e)","〜に取り組む (a)","取り組み方 (a)","〜を解決する (r)","〜を解決する (s)","〜を豊かにする (e)","〜に警告する (w)","〜に強いる (f)","訴える (a)","拍手 (a)","跳ぶ (l)","〜をつかむ (g)","〜をつかむ (s)","〜を投げる (c)","〜を気絶させる (s)","〜を照らす (i)","〜を明らかにする (u)","〜を修繕する (m)","反応する (r)","〜に耐える (e)","〜を結びつける (b)","〜に偶然出会う (e)","〜を捜し出す (t)","〜を経験する (u)","〜を密封する (s)"],
+					["solid","satellite","orbit","launch","attempt","capacity","capable","attain","desperate","dedicate","pain","strain","remedy","pharmacy","physician","disorder","pregnant","clinical","heal","infect","ankle","thumb","forehead","chin","chest","breast","lung","organ","vision","skeleton","sensation","code","agenda","liberty","committee","humanity","mankind","authority","justice","insurance","hardship","poverty","chaos","isolation","region","proof","warranty","principle","origin","setting","mission","project","monument","revolution","contract","infrastructure","negotiate","cooperate","restore","found","conservative","affair","agency","council","kingdom","republic","empire","aid","reform","minister","parliament","territory","poll","fortune","property","fund","stock","labor","overwork","firm","union","administration","secretary","editor","client","recruit","basis","element","constitute","unify","combine","unite","link","relevant","murder","arrest","prison","vice","witness","bullet","sword","wound","triumph","military","strategy","conquer","defend","dominate","rob","deprive","devastate","crash","hazard","debris","orphan","slave","acquaintance","merchant","resident","crew","chase","proceed","fade","dissolve","float","sink","bounce","transform","shift","modify","revise","enhance","lower","voyage","confirm","ensure","address","approach","resolve","settle","enrich","warn","force","appeal","applause","leap","grab","seize","cast","stun","illuminate","uncover","mend","react","endure","bind","encounter","trace","undergo","seal"]
+				];
+				len = Question.all[0].length;
+				progress.innerHTML = `${finished} / ${len}`;
+				next()
+			}
+
+			function fin() {
+				RText.innerHTML = `正答率 : ${Math.floor(len/sent*1000)/10}%`
+				result.style.visibility = "visible";
+			}
+
+			start()
+		</script>
+	</body>
+</html>
