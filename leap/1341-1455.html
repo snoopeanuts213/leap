@@ -1,0 +1,179 @@
+
+<!doctype HTML>
+<html>
+	<head>
+		<title>
+			LEAP 1341 ~ 1455
+		</title>
+		<style>
+			.main {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%,-50%);
+				width: 100%;
+			}
+			#Q_Text {
+				font-size: 70px;
+				text-align: center;
+				user-select: none;
+				margin-top: 0px;
+			}
+			#A_Text {
+				font-size: 20px;
+				text-align: center;
+				user-select: none;
+			}
+			#A_Input {
+				height: 30ox;
+				font-size: 30px;
+				position: relative;
+				left: 50%;
+				transform: translateX(-50%);
+			}
+			#progress {
+				position: absolute;
+				top: 10%;
+				left: 20%;
+			}
+			#result {
+				visibility: hidden;
+				background-color: #EEE;
+				height: 300px;
+				width: 700px; 
+				opacity: 0.95;
+				border-radius: 30px;
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%,-50%);
+				user-select: none;
+			}
+			#result p {
+				text-align: center;
+				font-size: 50px;
+			}
+			#result input {
+				position: relative;
+				left: 50%;
+				transform: translateX(-50%);
+			}
+		</style>
+	</head>
+	<body>
+		<div class="main">
+			<p id="Q_Text"></p>
+			<p id="A_Text">none
+			</p>
+			<form onsubmit="return send();">
+				<input id="A_Input">
+			</form>
+		</div>
+		<div id="result">
+			<p id="R_Text">正答率 : </p>
+			<form onsubmit="return restart();">
+				<input  type="submit" value="もう一度" >
+			</form>
+		</div>
+		<p id="progress"></p>
+		<script>
+			var QText = document.getElementById("Q_Text");
+			var AText = document.getElementById("A_Text");
+			var AInput = document.getElementById("A_Input");
+			var result = document.getElementById("result");
+			var RText = document.getElementById("R_Text");
+			var progress = document.getElementById("progress");
+			var Question	= {
+				all : [""],
+				now : [""]
+			}
+			var fail = 0;
+			var color = ["#FFF","#FFA","#EA0","#B00"];
+			var sent = 0;
+			var finished = 0;
+			var len = 0;
+			function send() {
+				event.preventDefault()
+				sent++;
+				if (AInput.value == Question.now[1]) {
+					finished++;
+					progress.innerHTML = `${finished} / ${len}`;
+					AInput.value = "";
+					AInput.style.backgroundColor = "#FFF";
+					AInput.style.color = "#000";
+					if (Question.all[0].length == 0) {
+						fin()
+					} else {
+						next()
+					}
+				} else {
+					fail++;
+					AInput.value = "";
+					AText.style.visibility = "visible";
+					var ans = "";
+					if (fail == 1) {
+						for (var i = 0; i < Question.now[1].length - 1; i++) ans += "*";
+						ans += Question.now[1].at(ans.length)
+					} else {
+						if (fail == 2) {
+							ans += Question.now[1].at(0) + Question.now[1].at(1)
+							for (var i = 0; i < Question.now[1].length - 3; i++) ans += "*";
+							if (Question.now[1] > 2) ans += Question.now[1].at(ans.length)
+						} else {
+							ans = Question.now[1]
+						}
+					}
+					AText.innerHTML = ans;
+					if (fail < 3) {
+						AInput.style.backgroundColor = color[fail];
+					} else {
+						AInput.style.backgroundColor = color[3];
+						AInput.style.color = "#FFF";
+					}
+				}
+			}
+
+			function next() {
+					fail = 0;
+					AInput.style.backgroundColor = "#FFF";
+					AInput.style.color = "#000";
+					var random = Math.floor(Math.random()*Question.all[0].length);
+
+					for (var n = 0; n < 2; n++) {
+						Question.now[n] = Question.all[n][random];
+					}
+
+					Question.all[0].splice(random,1)
+					Question.all[1].splice(random,1)
+					QText.innerHTML = Question.now[0];
+					AText.innerHTML = "none";
+					AText.style.visibility = "hidden";
+			}
+
+			function restart() {
+				event.preventDefault();
+				result.style.visibility = "hidden";
+				start(); 
+			}
+			
+			function start() {
+				finished = 0;
+				sent = 0;
+				Question.all = [
+					["葬式 (f)","魂 (s)","神父 (p)","信仰 (f)","神聖な (s)","神の (d)","イスラム教徒 (M)","文脈 (c)","単数の (s)","言語を操る力 (c)","例 (i)","会話 (d)","語法 (u)","母音 (v)","代名詞 (p)","訛り (a)","Aの要点を述べる (o)","辺鄙な (r)","願望 (a)","気性 (t)","愛情 (a)","情熱 (e)","激怒 (r)","信じられない (i)","くすくす笑う (c)","思い切ってAする (d)","悲鳴を上げる (s)","人をなだめる (s)","Aを誘惑する (t)","Aを叱る (s)","Aを圧迫する (o)","Aを脅かす (t)","Aを嘆く (m)","Aを犠牲にする (s)","災いの元 (c)","Aが原因である (s)","Aのきっかけになる (t)","結果 (c)","過程 (p)","Aに訴える (r)","方法 (f)","手続き (p)","並外れた (e)","絶対的な (a)","圧倒的な (o)","完全に (a)","すべての (e)","すさまじい (t)","とてつもないAの (s)","部分的な (p)","かろうじて (b)","おおよそ (a)","頻繁に (f)","見たところでは (a)","Aにすぎない (m)","それにもかかわらず (n)","何らかの方法で (s)","それゆえに (t)","その後 (a)","Aを代表して (o)","Aと断定する (a)","Aに逆らう (d)","Aを非難する (c)","Aを引き合いに出す (c)","Aを説明する (i)","Aを論駁する (r)","Aを訴える (s)","はっきり述べる (a)","解釈 (v)","提唱者 (a)","飛躍的進歩 (b)","進化 (e)","革新 (i)","探査機 (p)","流体 (f)","粒子 (p)","重力 (g)","仮説 (h)","標本 (s)","微生物 (m)","毒 (p)","酸性の (a)","有毒な (t)","努力 (e)","運命にある (d)","製造する (m)","産出する (y)","複製する (d)","組み立てる (a)","作る (m)","作り出す (c)","治療 (t)","注射 (i)","服用量 (d)","衛生 (s)","細菌 (g)","腫瘍 (t)","卒中 (s)","苦痛 (a)","疫病 (p)","疲労 (f)","診断 (d)","死亡率 (m)","看護 (n)","慢性の (c)","免疫の (i)","末期の (t)","健全な (s)","呼吸の (r)","息が詰まる (c)","麻痺させる (p)","処方する (p)","消化する (d)","疲れている (w)","栄養を与える (n)"],
+					["funeral","soul","priest","faith","sacred","divine","Muslim","context","singular","command","instance","dialogue","usage","vowel","pronoun","accent","outline","remote","ambition","temper","affection","enthusiasm","rage","incredible","chuckle","dare","scream","soothe","tempt","scold","oppress","threaten","mourn","sacrifice","curse","stem","trigger","consequence","process","resort","formula","procedure","extraordinary","absolute","overwhelming","altogether","entire","tremendous","sheer","partial","barely","approximately","frequently","apparently","merely","nevertheless","somehow","thus","afterward","on behalf of","assert","defy","condemn","cite","illustrate","refute","sue","articulate","version","advocate","breakthrough","evolution","innovation","probe","fluid","particle","gravity","hypothesis","specimen","microbe","poison","acid","toxic","endeavor","doom","manufacture","yield","duplicate","assemble","mold","coin","therapy","injection","dose","sanitation","germ","tumor","stroke","agony","plague","fatigue","diagnosis","mortality","nursing","chronic","immune","terminal","sound","respiratory","choke","paralyze","prescribe","digest","weary","nourish"]
+				];
+				len = Question.all[0].length;
+				progress.innerHTML = `${finished} / ${len}`;
+				next()
+			}
+
+			function fin() {
+				RText.innerHTML = `正答率 : ${Math.floor(len/sent*1000)/10}%`
+				result.style.visibility = "visible";
+			}
+
+			start()
+		</script>
+	</body>
+</html>
