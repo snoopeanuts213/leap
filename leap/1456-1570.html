@@ -1,0 +1,179 @@
+
+<!doctype HTML>
+<html>
+	<head>
+		<title>
+			LEAP 1341 ~ 1455
+		</title>
+		<style>
+			.main {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%,-50%);
+				width: 100%;
+			}
+			#Q_Text {
+				font-size: 70px;
+				text-align: center;
+				user-select: none;
+				margin-top: 0px;
+			}
+			#A_Text {
+				font-size: 20px;
+				text-align: center;
+				user-select: none;
+			}
+			#A_Input {
+				height: 30ox;
+				font-size: 30px;
+				position: relative;
+				left: 50%;
+				transform: translateX(-50%);
+			}
+			#progress {
+				position: absolute;
+				top: 10%;
+				left: 20%;
+			}
+			#result {
+				visibility: hidden;
+				background-color: #EEE;
+				height: 300px;
+				width: 700px; 
+				opacity: 0.95;
+				border-radius: 30px;
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%,-50%);
+				user-select: none;
+			}
+			#result p {
+				text-align: center;
+				font-size: 50px;
+			}
+			#result input {
+				position: relative;
+				left: 50%;
+				transform: translateX(-50%);
+			}
+		</style>
+	</head>
+	<body>
+		<div class="main">
+			<p id="Q_Text"></p>
+			<p id="A_Text">none
+			</p>
+			<form onsubmit="return send();">
+				<input id="A_Input">
+			</form>
+		</div>
+		<div id="result">
+			<p id="R_Text">正答率 : </p>
+			<form onsubmit="return restart();">
+				<input  type="submit" value="もう一度" >
+			</form>
+		</div>
+		<p id="progress"></p>
+		<script>
+			var QText = document.getElementById("Q_Text");
+			var AText = document.getElementById("A_Text");
+			var AInput = document.getElementById("A_Input");
+			var result = document.getElementById("result");
+			var RText = document.getElementById("R_Text");
+			var progress = document.getElementById("progress");
+			var Question	= {
+				all : [""],
+				now : [""]
+			}
+			var fail = 0;
+			var color = ["#FFF","#FFA","#EA0","#B00"];
+			var sent = 0;
+			var finished = 0;
+			var len = 0;
+			function send() {
+				event.preventDefault()
+				sent++;
+				if (AInput.value == Question.now[1]) {
+					finished++;
+					progress.innerHTML = `${finished} / ${len}`;
+					AInput.value = "";
+					AInput.style.backgroundColor = "#FFF";
+					AInput.style.color = "#000";
+					if (Question.all[0].length == 0) {
+						fin()
+					} else {
+						next()
+					}
+				} else {
+					fail++;
+					AInput.value = "";
+					AText.style.visibility = "visible";
+					var ans = "";
+					if (fail == 1) {
+						for (var i = 0; i < Question.now[1].length - 1; i++) ans += "*";
+						ans += Question.now[1].at(ans.length)
+					} else {
+						if (fail == 2) {
+							ans += Question.now[1].at(0) + Question.now[1].at(1)
+							for (var i = 0; i < Question.now[1].length - 3; i++) ans += "*";
+							if (Question.now[1].length > 2) ans += Question.now[1].at(ans.length)
+						} else {
+							ans = Question.now[1]
+						}
+					}
+					AText.innerHTML = ans;
+					if (fail < 3) {
+						AInput.style.backgroundColor = color[fail];
+					} else {
+						AInput.style.backgroundColor = color[3];
+						AInput.style.color = "#FFF";
+					}
+				}
+			}
+
+			function next() {
+					fail = 0;
+					AInput.style.backgroundColor = "#FFF";
+					AInput.style.color = "#000";
+					var random = Math.floor(Math.random()*Question.all[0].length);
+
+					for (var n = 0; n < 2; n++) {
+						Question.now[n] = Question.all[n][random];
+					}
+
+					Question.all[0].splice(random,1)
+					Question.all[1].splice(random,1)
+					QText.innerHTML = Question.now[0];
+					AText.innerHTML = "none";
+					AText.style.visibility = "hidden";
+			}
+
+			function restart() {
+				event.preventDefault();
+				result.style.visibility = "hidden";
+				start(); 
+			}
+			
+			function start() {
+				finished = 0;
+				sent = 0;
+				Question.all = [
+					["疲れている (w)","Aに栄養を与える (n)","ぞっとするような (a)","肉 (f)","手足 (l)","直立した (e)","脊椎の (s)","Aを吸う (s)","肩をすくめる (s)","AにBを補償する (c)","虐待 (a)","偏見 (b)","名声 (p)","特権 (p)","偉業 (f)","威厳 (d)","美徳 (v)","貴族 (a)","反逆者 (r)","計画 (s)","会議 (c)","会議 (c)","合意 (c)","新構想 (i)","州 (p)","植民地 (c)","辺境 (f)","条約 (t)","部族 (t)","年金 (p)","利害関係 (s)","報道 (c)","責務 (o)","衛生 (h)","監督者 (s)","普通のこと (n)","特許 (p)","原始的な (p)","民族の (e)","匿名の (a)","大都市の (m)","Aの権利がある (e)","人口統計上の (d)","Aを寄付する (d)","栄える (f)","Aに合わせる (c)","Aに従う (c)","法律 (l)","証言 (t)","陪審 (j)","正当な (l)","Aを施行する (e)","政権 (r)","官僚制度 (b)","腐敗 (c)","圧政 (t)","制裁 (s)","候補 (c)","上院議員 (s)","大使 (a)","外交官 (d)","難民 (r)","同盟国 (a)","統治 (r)","連邦の (f)","共産主義 (c)","市 (m)","財産 (e)","財産 (a)","歳入 (r)","赤字 (d)","商業 (c)","生産高 (o)","補助金 (s)","取り引き (t)","倒産した (b)","貨幣の (m)","企業 (c)","企業 (e)","事業 (v)","本社 (h)","全職員 (p)","起業家 (e)","前任者 (p)","骨折って働く (t)","Aを引き受ける (u)","合併する (m)","Aから成る (c)","構成要素 (c)","枠組 (f)","原型 (p)","側面 (d)","余白 (m)","優れている (e)","Aと矛盾する (c)","合意 (c)","正反対 (c)","不平等 (i)","等しい (e)","適合する (c)","同一の (i)","一致する (c)","無作為の (r)","戦士 (w)","襲撃 (a)","軍隊 (t)","盾 (s)","拷問 (t)","論争 (d)","戦闘 (c)","戦術 (t)","口論する (q)","戦う (c)","Aを虐殺する (s)","Aを鎮圧する (s)","降伏する (s)","敵意のある (h)"],
+					["appalling","flesh","limb","erect","spinal","suck","shrug","compensate","abuse","bias","prestige","privilege","feat","dignity","virtue","aristocracy","rebel","scheme","convention","conference","consent","initiative","province","colony","frontier","treaty","tribe","pension","stake","coverage","obligation","hygiene","supervisor","norm","patent","primitive","ethnic","anonymous","metropolitan","entitled","demographic","donate","flourish","conform","comply","legislation","testimony","jury","legitimate","enforce","regime","bureaucracy","corruption","tyranny","sanction","candidate","senator","ambassador","diplomat","refugee","ally","reign","federal","communist","municipal","estate","asset","revenue","deficit","commerce","output","subsidy","transaction","bankrupt","monetary","corporation","enterprise","venture","headquarters","personnel","entrepreneur","predecessor","toil","undertake","merge","comprise","component","framework","prototype","dimension","margin","excel","contradict","consensus","converse","inequality","equivalent","compatible","identical","correspond","random","warrior","assault","troop","shield","torture","dispute","combat","tactics","quarrel","contend","slaughter","suppress","surrender","hostile"]
+				];
+				len = Question.all[0].length;
+				progress.innerHTML = `${finished} / ${len}`;
+				next()
+			}
+
+			function fin() {
+				RText.innerHTML = `正答率 : ${Math.floor(len/sent*1000)/10}%`
+				result.style.visibility = "visible";
+			}
+
+			start()
+		</script>
+	</body>
+</html>
