@@ -1,0 +1,179 @@
+
+<!doctype HTML>
+<html>
+	<head>
+		<title>
+			LEAP 1701 ~ 1830
+		</title>
+		<style>
+			.main {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%,-50%);
+				width: 100%;
+			}
+			#Q_Text {
+				font-size: 70px;
+				text-align: center;
+				user-select: none;
+				margin-top: 0px;
+			}
+			#A_Text {
+				font-size: 20px;
+				text-align: center;
+				user-select: none;
+			}
+			#A_Input {
+				height: 30ox;
+				font-size: 30px;
+				position: relative;
+				left: 50%;
+				transform: translateX(-50%);
+			}
+			#progress {
+				position: absolute;
+				top: 10%;
+				left: 20%;
+			}
+			#result {
+				visibility: hidden;
+				background-color: #EEE;
+				height: 300px;
+				width: 700px; 
+				opacity: 0.95;
+				border-radius: 30px;
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%,-50%);
+				user-select: none;
+			}
+			#result p {
+				text-align: center;
+				font-size: 50px;
+			}
+			#result input {
+				position: relative;
+				left: 50%;
+				transform: translateX(-50%);
+			}
+		</style>
+	</head>
+	<body>
+		<div class="main">
+			<p id="Q_Text"></p>
+			<p id="A_Text">none
+			</p>
+			<form onsubmit="return send();">
+				<input autocomplete="off" id="A_Input">
+			</form>
+		</div>
+		<div id="result">
+			<p id="R_Text">正答率 : </p>
+			<form onsubmit="return restart();">
+				<input  type="submit" value="もう一度" >
+			</form>
+		</div>
+		<p id="progress"></p>
+		<script>
+			var QText = document.getElementById("Q_Text");
+			var AText = document.getElementById("A_Text");
+			var AInput = document.getElementById("A_Input");
+			var result = document.getElementById("result");
+			var RText = document.getElementById("R_Text");
+			var progress = document.getElementById("progress");
+			var Question	= {
+				all : [""],
+				now : [""]
+			}
+			var fail = 0;
+			var color = ["#FFF","#FFA","#EA0","#B00"];
+			var sent = 0;
+			var finished = 0;
+			var len = 0;
+			function send() {
+				event.preventDefault()
+				sent++;
+				if (AInput.value == Question.now[1]) {
+					finished++;
+					progress.innerHTML = `${finished} / ${len}`;
+					AInput.value = "";
+					AInput.style.backgroundColor = "#FFF";
+					AInput.style.color = "#000";
+					if (Question.all[0].length == 0) {
+						fin()
+					} else {
+						next()
+					}
+				} else {
+					fail++;
+					AInput.value = "";
+					AText.style.visibility = "visible";
+					var ans = "";
+					if (fail == 1) {
+						for (var i = 0; i < Question.now[1].length - 1; i++) ans += "*";
+						ans += Question.now[1].at(ans.length)
+					} else {
+						if (fail == 2) {
+							ans += Question.now[1].at(0) + Question.now[1].at(1)
+							for (var i = 0; i < Question.now[1].length - 3; i++) ans += "*";
+							if (Question.now[1].length > 2) ans += Question.now[1].at(ans.length)
+						} else {
+							ans = Question.now[1]
+						}
+					}
+					AText.innerHTML = ans;
+					if (fail < 3) {
+						AInput.style.backgroundColor = color[fail];
+					} else {
+						AInput.style.backgroundColor = color[3];
+						AInput.style.color = "#FFF";
+					}
+				}
+			}
+
+			function next() {
+					fail = 0;
+					AInput.style.backgroundColor = "#FFF";
+					AInput.style.color = "#000";
+					var random = Math.floor(Math.random()*Question.all[0].length);
+
+					for (var n = 0; n < 2; n++) {
+						Question.now[n] = Question.all[n][random];
+					}
+
+					Question.all[0].splice(random,1)
+					Question.all[1].splice(random,1)
+					QText.innerHTML = Question.now[0];
+					AText.innerHTML = "none";
+					AText.style.visibility = "hidden";
+			}
+
+			function restart() {
+				event.preventDefault();
+				result.style.visibility = "hidden";
+				start(); 
+			}
+			
+			function start() {
+				finished = 0;
+				sent = 0;
+				Question.all = [
+					["〜を予知する (f)", "AからBを推測する (i)", "AからBを推定する (d)", "OをCだと思う (d)", "〜を熟考する (p)", "〜に保証する (a)", "〜を評価する (a)", "〜を認める (c)", "妥協する (c)", "〜を理解している (c)", "AをBと調和させる (r)", "〜を植え付ける (i)", "油断のない (a)", "認知の (c)", "直観 (i)", "誓い (v)", "悪夢 (n)", "固定観念 (s)", "幻想 (i)", "基準 (c)", "イデオロギー (i)", "〜を大目に見る (t)", "〜を見落とす (o)", "〜を思い浮かべる (c)", "〜を誤解している (m)", "鋭い (k)", "主観的な (s)", "義務的な (c)", "〜を取り除く (r)", "〜を刈り込む (t)", "処分 (d)", "香り (s)", "穀物 (g)", "小麦 (w)", "森林伐採 (d)", "干ばつ (d)", "灌漑 (i)", "光景 (s)", "標高 (a)", "大災害 (c)", "荒野 (w)", "腐敗 (d)", "侵食 (e)", "炎 (f)", "銀河 (g)", "寒気 (c)", "熱の (t)", "肥沃な (f)", "化石化した (f)", "〜を利用する (e)", "〜を汚染する (c)", "噴火する (e)", "ほえる (r)", "〜に生息している (i)", "〜を育てる (n)", "フクロウ (o)", "本能 (i)", "餌食 (p)", "解剖 (a)", "哺乳動物 (m)", "捕食動物 (p)", "交配種 (h)", "頭蓋骨 (s)", "木材 (t)", "織物 (t)", "布地 (f)", "製造工場 (m)", "〜を織る (w)", "有能な (c)", "楽観的な (o)", "愛国的な (p)", "高潔な (n)", "いたずらな (n)", "傲慢な (a)", "精力的な (v)", "控えめな (h)", "資格のある (e)", "礼儀正しさ (c)", "回復の早い (r)", "〜する傾向がある (i)", "〜につきまとう (h)", "没頭した (i)", "〜にふける (i)", "傷 (f)", "欠陥 (d)", "特性 (t)", "類似点 (a)", "類似 (p)", "不可欠な (i)", "重大な (c)", "重大な (g)", "主な (p)", "不可欠な (v)", "不可欠な (i)", "深い (p)", "厳しい (g)", "激しい (f)", "厳しい (h)","深刻な (a)", "曖昧な (a)", "誤解を招く (m)", "ぼやけた (o)", "成熟した (m)", "きちんとした (n)", "まともな (d)", "わかりやすい (s)", "高度な (s)", "手の込んだ (e)", "迅速な (p)", "素早い (s)", "強力な (m)", "明確な (e)", "本物の (a)", "機知 (w)", "好調である (t)", "薄暗い (d)", "薄暗い (g)", "不毛な (b)", "何もしていない (i)", "不都合な (a)", "退屈な (t)", "無器用な (c)", "不快な (f)", "みすぼらしい (s)", "常軌を逸した (o)", "ばかげた (a)", "壊れやすい (f)", "傷つきやすい (v)", "静的な (s)", "先天的な (i)"],
+					["foresee", "infer", "deduce", "deem", "ponder", "assure", "assess", "concede", "compromise", "comprehend", "reconcile", "instill", "alert", "cognitive", "intuition", "vow", "nightmare", "stereotype", "illusion", "criterion", "ideology", "tolerate", "overlook", "conceive", "misunderstand", "keen", "subjective", "compulsory", "relieve", "trim", "disposal", "scent", "grain", "wheat", "deforestation", "drought", "irrigation", "spectacle", "altitude", "catastrophe", "wilderness", "decay", "erosion", "flame", "galaxy", "chill", "thermal", "fertile", "fossil", "exploit", "contaminate", "erupt", "roar", "inhabit", "nurture", "owl", "instinct", "prey", "anatomy", "mammal", "predator", "hybrid", "skull", "timber", "textile", "fabric", "mill", "weave", "competent", "optimistic", "patriotic", "noble", "naughty", "arrogant", "vigorous", "humble", "eligible", "courtesy", "resilient", "inclined", "haunt", "intent", "indulge", "flaw", "defect", "trait", "analogy", "parallel", "indispensable", "crucial", "grave", "primary", "vital", "integral", "profound", "grim", "fierce", "harsh","acute", "ambiguous", "misleading", "obscure", "mature", "neat", "decent", "straightforward", "sophisticated", "elaborate", "prompt", "swift", "mighty", "explicit", "authentic", "wit", "thrive", "dim", "gloomy", "barren", "idle", "adverse", "tiresome", "clumsy", "foul", "shabby", "outrageous", "absurd", "fragile", "vulnerable", "static", "innate"]
+				];
+				len = Question.all[0].length;
+				progress.innerHTML = `${finished} / ${len}`;
+				next()
+			}
+
+			function fin() {
+				RText.innerHTML = `正答率 : ${Math.floor(len/sent*1000)/10}%`
+				result.style.visibility = "visible";
+			}
+
+			start()
+		</script>
+	</body>
+</html>
